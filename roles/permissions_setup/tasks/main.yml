@@ -31,7 +31,7 @@
   copy: 
     content: |
       [Socket]
-      SocketMode=0600
+      SocketMode=0660
       SocketUser=root 
       SocketGroup={{ podman_user_group }}
     dest: /etc/systemd/system/podman.socket.d/overlay.conf
