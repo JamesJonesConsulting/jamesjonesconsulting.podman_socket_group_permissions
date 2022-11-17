@@ -1,4 +1,5 @@
-# Ansible Collection - jamesjonesconsulting.podman_socket_group_permissions
+# Ansible Collection 
+## `jamesjonesconsulting.podman_socket_group_permissions`
 
 This collection is for setting up Podman to _act_ more like Docker particularly for automation that specifically
 supports Docker and needs to make use of the docker socket (like docker-compose, Azure DevOps, GitLab and Github Actions).
