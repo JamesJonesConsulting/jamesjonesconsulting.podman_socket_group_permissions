@@ -1,5 +1,5 @@
 permissions_setup
-=========
+=================
 
 Sets up a user group that has permissions to the socket and integrates pretty seemlessly into tools like docker-compose, Azure DevOps, GitLab and Github Actions.
 
