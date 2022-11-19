@@ -56,6 +56,11 @@
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
+- name: Enable linger on members of the Podman group 
+  command: "loginctl enable-linger {{ podman_user }}"
+  loop: "{{ podman_users | default([]) }}"
+  loop_control:
+    loop_var: podman_user
 - name: Suppress the docker emulation message 
   file:
     path: /etc/containers/nodocker
