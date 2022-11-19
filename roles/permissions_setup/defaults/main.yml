@@ -1,3 +1,5 @@
 ---
 podman_user_group: docker
 podman_users: []
+supported_os_families:
+  - RedHat

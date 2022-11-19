@@ -1,0 +1,62 @@
+---
+- name: Ensure Container-Tools are installed
+  command: dnf module install container-tools -y 
+  when:
+    - "ansible_facts['distribution'] in ['RedHat','CentOS']"
+    - "ansible_facts[‘distribution_major_version’] in ['8','9']"
+- name: Ensure Podman related packages are installed 
+  yum:
+    name:
+      - podman 
+      - skopeo
+      - buildah
+      - podman-docker
+- name: Ensure the user group exists
+  group: 
+    name: "{{ podman_user_group }}"
+    state: present 
+    system: yes 
+- name: Add specified users to the group 
+  user:
+    name: "{{ podman_user }}"
+    groups: "{{ podman_user_group }}"
+    append: yes 
+    system: yes 
+  ignore_errors: true
+  loop: "{{ podman_users | default([]) }}"
+  loop_control:
+    loop_var: podman_user
+- name: Ensure the overlay directory is created
+  file:
+    path: /etc/systemd/system/podman.socket.d
+    state: directory 
+- name: Setup the overlay 
+  copy: 
+    content: |
+      [Socket]
+      SocketMode=0660
+      SocketUser=root 
+      SocketGroup={{ podman_user_group }}
+    dest: /etc/systemd/system/podman.socket.d/overlay.conf
+- name: Setup the tmpfiles.d for the /run/podman directory 
+  copy: 
+    content: |
+      d /run/podman 0770 root {{ podman_user_group }}
+    dest: /etc/tmpfiles.d/podman.conf
+- name: Do a create for systemd-tmpfiles
+  command: systemd-tmpfiles --create
+- name: Enable the Podman socket 
+  ansible.builtin.systemd:
+    name: podman.socket 
+    state: restarted 
+    daemon_reload: yes 
+    enabled: true 
+- name: Setup /etc/subuid and /etc/subgid configuration
+  command: "usermod --add-subuids 100000-165535 --add-subgids 100000-165535 {{ podman_user }}"
+  loop: "{{ podman_users | default([]) }}"
+  loop_control:
+    loop_var: podman_user
+- name: Suppress the docker emulation message 
+  file:
+    path: /etc/containers/nodocker
+    state: touch
