@@ -4,8 +4,8 @@
 This collection is for setting up Podman to _act_ more like Docker particularly for automation that specifically
 supports Docker and needs to make use of the docker socket (like docker-compose, Azure DevOps, GitLab and Github Actions).
 
-Currently, this collection contains 'one' role that `jamesjonesconsulting.permissions_setup` that sets up a user group that
-has permissions to the socket and integrates pretty seemlessly into the tools I aformentioned. 
+Currently, this collection contains 'one' role that `jamesjonesconsulting.podman_socket_group_permissions.permissions_setup` 
+that sets up a user group that has permissions to the socket and integrates pretty seemlessly into the tools I aformentioned. 
 
 ## Usage
 
@@ -13,7 +13,7 @@ The role is called like this in an ansible playbook (note: you will need to be r
 
 ```
 include_role:
-  name: jamesjonesconsulting.permissions_setup
+  name: jamesjonesconsulting.podman_socket_group_permissions.permissions_setup
 vars:
   podman_user_group: docker
   podman_users:
