@@ -74,6 +74,9 @@
     dest: "${{ getent_passwd[podman_user].4 }}/.config/containers/containers.conf"
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
+  loop: "{{ podman_users | default([]) }}"
+  loop_control:
+    loop_var: podman_user
 - name: Enable the Podman socket 
   ansible.builtin.systemd:
     name: podman.socket 
