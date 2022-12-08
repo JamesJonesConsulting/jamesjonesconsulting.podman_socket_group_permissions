@@ -2,7 +2,7 @@
 - name: Ensure Container-Tools are installed
   command: dnf module install container-tools -y 
   when:
-    - "ansible_facts['distribution'] in ['RedHat','CentOS']"
+    - "ansible_facts['distribution'] in ['RedHat']"
     - "ansible_facts['distribution_major_version'] in ['8','9']"
 - name: Ensure Podman related packages are installed 
   yum:
