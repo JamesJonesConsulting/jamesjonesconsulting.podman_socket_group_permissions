@@ -3,3 +3,4 @@
 crio_search_registries:
   - registry.fedoraproject.org
   - docker.io
+  - quay.io
