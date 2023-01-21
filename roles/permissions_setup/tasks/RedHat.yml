@@ -2,7 +2,12 @@
 - name: Ensure Container-Tools are installed
   command: dnf module install container-tools -y 
   when:
-    - "ansible_facts['distribution'] in ['RedHat','CentOS']"
+    - "ansible_facts['distribution'] in ['RedHat']"
+    - "ansible_facts['distribution_major_version'] in ['8','9']"
+- name: Ensure Container-Tools are installed
+  command: dnf install container-tools -y 
+  when:
+    - "ansible_facts['distribution'] in ['CentOS']"
     - "ansible_facts['distribution_major_version'] in ['8','9']"
 - name: Ensure Podman related packages are installed 
   yum:
@@ -48,6 +53,7 @@
 - name: Setup per-podman user container writable folders for Azure DevOps agent support
   copy:
     content: |
+      d /run/user/{{ getent_passwd[podman_user].1 }} 0770 {{ podman_user }} {{ podman_user_group }}
       d /run/user/{{ getent_passwd[podman_user].1 }}/containers 0770 {{ podman_user }} {{ podman_user_group }}
       d /run/user/{{ getent_passwd[podman_user].1 }}/libpod	0770 {{ podman_user }} {{ podman_user_group }}
     dest: "/etc/tmpfiles.d/podman-{{ podman_user }}.conf"
