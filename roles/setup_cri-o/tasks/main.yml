@@ -1,0 +1,29 @@
+---
+# tasks file for setup_cri-o
+- name: Add the br_netfilter module
+  community.general.modprobe:
+    name: "{{ mod }}"
+    state: present
+  loop:
+    - br_netfilter
+    - overlay
+  loop_control:
+    loop_var: mod
+- name: Ensure modules are loaded on reboot
+  ansible.builtin.copy:
+    content: |
+      overlay
+      br_netfilter
+    dest: /etc/modules-load.d/crio.conf
+    owner: root
+    group: root
+    mode: 0644
+- name: Setup unqualified search registries
+  ansible.builtin.copy:
+    content: |
+      unqualified-search-registries=[{% for reg in crio_search_registries %}"{{ reg }}"{{ "," if not loop.last }}{% endfor %}]
+    dest: /etc/containers/registries.conf
+    owner: root
+    group: root
+    mode: 0644
+    

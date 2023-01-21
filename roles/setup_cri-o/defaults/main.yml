@@ -1,0 +1,5 @@
+---
+# defaults file for setup_cri-o
+crio_search_registries:
+  - registry.fedoraproject.org
+  - docker.io
