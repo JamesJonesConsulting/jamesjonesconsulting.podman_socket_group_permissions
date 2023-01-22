@@ -34,7 +34,7 @@
   loop_control:
     loop_var: crio_repo
   vars:
-    crio_yum_dist: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']][hostvars[inventory_hostname]['ansible_facts']['major_version']]['use'] }}"
+    crio_yum_dist: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']][hostvars[inventory_hostname]['ansible_facts']['distribution_major_version']]['use'] }}"
 
 
 # - name: Download crio installer
