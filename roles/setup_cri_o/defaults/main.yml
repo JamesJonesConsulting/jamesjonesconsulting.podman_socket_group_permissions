@@ -3,3 +3,37 @@ crio_search_registries:
   - registry.fedoraproject.org
   - docker.io
   - quay.io
+crio_version_map:
+  Fedora:
+   31:
+      use: CentOS_7
+  CentOS:
+    7:
+      use: CentOS_7
+    8:
+      use: CentOS_8
+    9:
+      use: CentOS_8
+  Debian:
+    Unstable:
+      use: CentOS_7
+    Testing:
+      use: CentOS_7
+    10:
+      use: CentOS_7
+    11:
+      use: CentOS_7
+  Rasbian:
+    10:
+      use: CentOS_7
+  Ubuntu:
+    22.04:
+      use: CentOS_7
+    21.10:
+      use: CentOS_7
+    20.04:
+      use: CentOS_7
+    18.04:
+      use: CentOS_7
+
+

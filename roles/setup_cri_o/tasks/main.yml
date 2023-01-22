@@ -1,13 +1,50 @@
 ---
 # tasks file for setup_cri-o
-- name: Download crio installer
+- name: Get the latest CRI-O version
+  ansible.builtin.shell: |
+    CRIO_VER=$(curl --silent "https://api.github.com/repos/cri-o/cri-o/releases/latest" | jq .tag_name -r)
+    CRIO_VER=${CRIO_VER#"v"}
+    echo "$CRIO_VER"
+  register: crio_version
+- ansible.builtin.debug:
+    msg: "{{ crio_version }}"
+- name: Find any prior kubic repos
+  ansible.builtin.find:
+    paths: /etc/yum.repos.d
+    patterns: "devel_kubic_libcontainers*.repo"
+  register: kubic_find_results
+- name: Remove any found prior kubic repos
+  ansible.builtin.file:
+    path: "{{ kubic_repo['path'] }}"
+    state: absent
+  loop: "{{ kubic_find_results['files'] }}"
+  loop_control:
+    loop_var: kubic_repo
+- name: Download crio yum repo files
   ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/cri-o/cri-o/main/scripts/get"
-    dest: /tmp/getcrio.sh
+    url: "{{ crio_repo.url }}"
+    dest: "{{ crio_repo.repo }}"
     mode: '0750'
     force: true
-- name: Run the crio installer
-  ansible.builtin.shell: /tmp/getcrio.sh
-  args:
-    executable: /bin/bash
-  register: _result
+  loop:
+    - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable.repo"
+      repo: /etc/yum.repos.d/devel_kubic_libcontainers_stable.repo
+    - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version.stdout }}/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable:cri-o:{{ crio_version.stdout }}.repo"
+      repo: "/etc/yum.repos.d/devel_kubic_libcontainers_stable_cri-o_{{ crio_version.stdout }}.repo"
+  loop_control:
+    loop_var: crio_repo
+  vars:
+    crio_yum_dist: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']][hostvars[inventory_hostname]['ansible_facts']['major_version']]['use'] }}"
+
+
+# - name: Download crio installer
+#   ansible.builtin.get_url:
+#     url: "https://raw.githubusercontent.com/cri-o/cri-o/main/scripts/get"
+#     dest: /tmp/getcrio.sh
+#     mode: '0750'
+#     force: true
+# - name: Run the crio installer
+#   ansible.builtin.shell: /tmp/getcrio.sh
+#   args:
+#     executable: /bin/bash
+#   register: _result
