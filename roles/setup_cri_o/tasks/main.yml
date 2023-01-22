@@ -32,13 +32,13 @@
   loop:
     - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable.repo"
       repo: /etc/yum.repos.d/devel_kubic_libcontainers_stable.repo
-    - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version.stdout }}/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable:cri-o:{{ crio_version.stdout }}.repo"
-      repo: "/etc/yum.repos.d/devel_kubic_libcontainers_stable_cri-o_{{ crio_version.stdout }}.repo"
+    - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_yum_version }}/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable:cri-o:{{ crio_yum_version }}.repo"
+      repo: "/etc/yum.repos.d/devel_kubic_libcontainers_stable_cri-o_{{ crio_yum_version }}.repo"
   loop_control:
     loop_var: crio_repo
   vars:
     crio_yum_dist: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']][hostvars[inventory_hostname]['ansible_facts']['distribution_major_version']]['use'] }}"
-
+    crio_yum_version: "{{ crio_version.stdout.split('.')[:-1] | join('.') }}"
 
 # - name: Download crio installer
 #   ansible.builtin.get_url:
