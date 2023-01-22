@@ -21,7 +21,7 @@
   loop_control:
     loop_var: kubic_repo
 - ansible.builtin.debug:
-    msg: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']] }}"
+    msg: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']]['9'] }}"
 
 - name: Download crio yum repo files
   ansible.builtin.get_url:
