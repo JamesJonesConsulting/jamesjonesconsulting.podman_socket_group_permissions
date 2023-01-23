@@ -6,8 +6,6 @@
     CRIO_VER=${CRIO_VER#"v"}
     echo "$CRIO_VER"
   register: crio_version
-- ansible.builtin.debug:
-    msg: "{{ crio_version }}"
 - name: Find any prior kubic repos
   ansible.builtin.find:
     paths: /etc/yum.repos.d
@@ -20,9 +18,6 @@
   loop: "{{ kubic_find_results['files'] }}"
   loop_control:
     loop_var: kubic_repo
-- ansible.builtin.debug:
-    msg: "{{ crio_version_map[hostvars[inventory_hostname]['ansible_facts']['distribution']]['9'] }}"
-
 - name: Download crio yum repo files
   ansible.builtin.get_url:
     url: "{{ crio_repo.url }}"
