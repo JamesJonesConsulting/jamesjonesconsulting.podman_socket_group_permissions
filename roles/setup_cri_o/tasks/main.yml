@@ -1,5 +1,4 @@
 ---
-# tasks file for setup_cri-o
 - name: Get the latest CRI-O version
   ansible.builtin.shell: |
     CRIO_VER=$(curl --silent "https://api.github.com/repos/cri-o/cri-o/releases/latest" | jq .tag_name -r)
