@@ -6,7 +6,7 @@ crio_search_registries:
 crio_version_map:
   Fedora:
    '31':
-      use: CentOS_7
+      use: Fedora_36
   CentOS:
     '7':
       use: CentOS_7
