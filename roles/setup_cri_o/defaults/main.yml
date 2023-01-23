@@ -11,9 +11,9 @@ crio_version_map:
     '7':
       use: CentOS_7
     '8':
-      use: CentOS_8
+      use: CentOS_8_Stream
     '9':
-      use: CentOS_8
+      use: CentOS_8_Stream
   Debian:
     Unstable:
       use: CentOS_7
