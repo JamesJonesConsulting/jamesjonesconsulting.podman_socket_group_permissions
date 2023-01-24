@@ -23,6 +23,7 @@
     dest: "{{ crio_repo.repo }}"
     mode: '0750'
     force: true
+    timeout: 120
   loop:
     - url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/{{ crio_yum_dist }}/devel:kubic:libcontainers:stable.repo"
       repo: /etc/yum.repos.d/devel_kubic_libcontainers_stable.repo
