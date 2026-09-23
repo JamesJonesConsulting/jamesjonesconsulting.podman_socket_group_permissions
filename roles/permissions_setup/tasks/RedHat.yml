@@ -1,78 +1,87 @@
 ---
 - name: Ensure Container-Tools are installed
-  command: dnf module install container-tools -y 
+  ansible.builtin.command: dnf module install container-tools -y
+  changed_when: true
   when:
     - "ansible_facts['distribution'] in ['RedHat']"
     - "ansible_facts['distribution_major_version'] in ['8','9']"
 - name: Ensure Container-Tools are installed
-  command: dnf install container-tools -y 
+  ansible.builtin.command: dnf install container-tools -y
+  changed_when: true
   when:
     - "ansible_facts['distribution'] in ['CentOS']"
     - "ansible_facts['distribution_major_version'] in ['8','9']"
-- name: Ensure Podman related packages are installed 
-  yum:
+- name: Ensure Podman related packages are installed
+  ansible.builtin.yum:
     name:
-      - podman 
+      - podman
       - skopeo
       - buildah
       - podman-docker
 - name: Ensure the user group exists
-  group: 
+  ansible.builtin.group:
     name: "{{ podman_user_group }}"
-    state: present 
-    system: yes 
-- name: Add specified users to the group 
-  user:
+    state: present
+    system: true
+- name: Add specified users to the group
+  ansible.builtin.user:
     name: "{{ podman_user }}"
     groups: "{{ podman_user_group }}"
-    append: yes 
-    system: yes 
+    append: true
+    system: true
   ignore_errors: true
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
 - name: Ensure the overlay directory is created
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/podman.socket.d
-    state: directory 
-- name: Setup the overlay 
-  copy: 
+    state: directory
+    mode: "0755"
+- name: Setup the overlay
+  ansible.builtin.copy:
     content: |
       [Socket]
       SocketMode=0660
-      SocketUser=root 
+      SocketUser=root
       SocketGroup={{ podman_user_group }}
     dest: /etc/systemd/system/podman.socket.d/overlay.conf
-- name: Setup the tmpfiles.d for the /run/podman directory 
-  copy: 
+    mode: "0644"
+- name: Setup the tmpfiles.d for the /run/podman directory
+  ansible.builtin.copy:
     content: |
       d /run/podman 0770 root {{ podman_user_group }}
     dest: /etc/tmpfiles.d/podman.conf
-- ansible.builtin.getent:
+    mode: "0644"
+- name: Get the password database info
+  ansible.builtin.getent:
     database: passwd
 - name: Setup per-podman user container writable folders for Azure DevOps agent support
-  copy:
+  ansible.builtin.copy:
     content: |
       d /run/user/{{ getent_passwd[podman_user].1 }} 0770 {{ podman_user }} {{ podman_user_group }}
       d /run/user/{{ getent_passwd[podman_user].1 }}/containers 0770 {{ podman_user }} {{ podman_user_group }}
       d /run/user/{{ getent_passwd[podman_user].1 }}/libpod	0770 {{ podman_user }} {{ podman_user_group }}
     dest: "/etc/tmpfiles.d/podman-{{ podman_user }}.conf"
+    mode: "0644"
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
 - name: Do a create for systemd-tmpfiles
-  command: systemd-tmpfiles --create
+  ansible.builtin.command: systemd-tmpfiles --create
+  changed_when: true
 - name: Create per-user directory for containers.conf
-  file:
+  ansible.builtin.file:
     path: "${{ getent_passwd[podman_user].4 }}/.config/containers"
     state: directory
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
+    mode: "0755"
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
 - name: Make this cgroups friendly for docker emulation
-  copy:
+  ansible.builtin.copy:
     content: |
       [engine]
       events_logger = "file"
@@ -80,26 +89,31 @@
     dest: "${{ getent_passwd[podman_user].4 }}/.config/containers/containers.conf"
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
+    mode: "0644"
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
-- name: Enable the Podman socket 
+- name: Enable the Podman socket
   ansible.builtin.systemd:
-    name: podman.socket 
-    state: restarted 
-    daemon_reload: yes 
-    enabled: true 
+    name: podman.socket
+    state: restarted
+    daemon_reload: true
+    enabled: true
 - name: Setup /etc/subuid and /etc/subgid configuration
-  command: "usermod --add-subuids 100000-165535 --add-subgids 100000-165535 {{ podman_user }}"
+  ansible.builtin.command: "usermod --add-subuids 100000-165535 --add-subgids 100000-165535 {{ podman_user }}"
+  changed_when: true
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
-- name: Enable linger on members of the Podman group 
-  command: "loginctl enable-linger {{ podman_user }}"
+- name: Enable linger on members of the Podman group
+  ansible.builtin.command: "loginctl enable-linger {{ podman_user }}"
+  changed_when: true
   loop: "{{ podman_users | default([]) }}"
   loop_control:
     loop_var: podman_user
-- name: Suppress the docker emulation message 
-  file:
+- name: Suppress the docker emulation message
+  ansible.builtin.file:
     path: /etc/containers/nodocker
     state: touch
+    mode: "0644"
+  changed_when: true
