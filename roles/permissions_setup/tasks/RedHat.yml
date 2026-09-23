@@ -72,7 +72,7 @@
   changed_when: true
 - name: Create per-user directory for containers.conf
   ansible.builtin.file:
-    path: "${{ getent_passwd[podman_user].4 }}/.config/containers"
+    path: "${{ ansible_facts['getent_passwd'][podman_user].4 }}/.config/containers"
     state: directory
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
@@ -86,7 +86,7 @@
       [engine]
       events_logger = "file"
       cgroup_manager = "cgroupfs"
-    dest: "${{ getent_passwd[podman_user].4 }}/.config/containers/containers.conf"
+    dest: "${{ ansible_facts['getent_passwd'][podman_user].4 }}/.config/containers/containers.conf"
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
     mode: "0644"
