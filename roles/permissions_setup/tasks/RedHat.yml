@@ -59,9 +59,9 @@
 - name: Setup per-podman user container writable folders for Azure DevOps agent support
   ansible.builtin.copy:
     content: |
-      d /run/user/{{ getent_passwd[podman_user].1 }} 0770 {{ podman_user }} {{ podman_user_group }}
-      d /run/user/{{ getent_passwd[podman_user].1 }}/containers 0770 {{ podman_user }} {{ podman_user_group }}
-      d /run/user/{{ getent_passwd[podman_user].1 }}/libpod	0770 {{ podman_user }} {{ podman_user_group }}
+      d /run/user/{{ ansible_facts["getent_passwd"][podman_user].1 }} 0770 {{ podman_user }} {{ podman_user_group }}
+      d /run/user/{{ ansible_facts["getent_passwd"][podman_user].1 }}/containers 0770 {{ podman_user }} {{ podman_user_group }}
+      d /run/user/{{ ansible_facts["getent_passwd"][podman_user].1 }}/libpod	0770 {{ podman_user }} {{ podman_user_group }}
     dest: "/etc/tmpfiles.d/podman-{{ podman_user }}.conf"
     mode: "0644"
   loop: "{{ podman_users | default([]) }}"
